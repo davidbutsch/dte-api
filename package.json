@@ -1,0 +1,36 @@
+{
+  "name": "dte-api",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "dev": "cross-env NODE_ENV=development nodemon --require ts-node/register --watch src ./src/index.ts",
+    "prod": "cross-env NODE_ENV=production ts-node ./src/index.ts",
+    "start": "node ./dist/index.js",
+    "build": "tsc --build",
+    "stripe:listen": "stripe listen --forward-to localhost:8000/stripe/webhook"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "aws-jwt-verify": "^5.1.0",
+    "cors": "^2.8.5",
+    "cross-env": "^7.0.3",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "helmet": "^8.1.0",
+    "module-alias": "^2.2.3",
+    "nodemon": "^3.1.10",
+    "stripe": "^18.1.0",
+    "ts-node": "^10.9.2",
+    "winston": "^3.17.0"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.18",
+    "@types/express": "^5.0.1",
+    "@types/helmet": "^0.0.48",
+    "@types/module-alias": "^2.0.4",
+    "@types/node": "^22.15.17"
+  }
+}
