@@ -24,7 +24,8 @@
     "nodemon": "^3.1.10",
     "stripe": "^18.1.0",
     "ts-node": "^10.9.2",
-    "winston": "^3.17.0"
+    "winston": "^3.17.0",
+    "zod": "^3.24.4"
   },
   "devDependencies": {
     "@types/cors": "^2.8.18",

@@ -11,6 +11,7 @@ export const app = express();
 app.enable("trust proxy");
 app.use(helmet());
 app.use(cors());
+app.use(express.json());
 
 // Handle undefined routes
 app.use((_request, _response, next) =>
