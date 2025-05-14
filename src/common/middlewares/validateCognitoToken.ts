@@ -31,16 +31,16 @@ export const validateCognitoToken: RequestHandler = async (
     // Move to next middleware
     next();
   } catch (error) {
-    // Throw custom errors if constructor name is recognized
+    // Pass custom error if constructor name is recognized
     if (error instanceof Error)
       switch (error.constructor.name) {
         case "JwtExpiredError":
           return next(new UnauthorizedError("Authorization token expired."));
       }
 
-    // Otherwise throw internal server error
+    // Otherwise pass InternalServerError and include unrecognized error
     return next(
-      new InternalServerError(`Error verifying authorization token: ${error}`)
+      new InternalServerError(`Error verifying authorization token.`, { error })
     );
   }
 };

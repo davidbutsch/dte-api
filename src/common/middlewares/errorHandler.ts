@@ -3,25 +3,31 @@ import { Logger } from "@/libs";
 import { ErrorRequestHandler } from "express";
 
 export const errorHandler: ErrorRequestHandler = (
-  error,
+  err,
   _request,
   response,
   _next
 ) => {
-  const isHttpError = error instanceof HttpError;
+  const isHttpError = err instanceof HttpError;
 
-  const name = isHttpError ? error.name : "InternalServerError";
-  const status = isHttpError ? error.status : 500;
-  const message = isHttpError ? error.message : "Internal Server Error";
+  const name = isHttpError ? err.name : "InternalServerError";
+  const status = isHttpError ? err.status : 500;
+  const message = isHttpError ? err.message : "Internal Server Error";
+
+  const error: Record<string, any> = {
+    name,
+    status,
+    message,
+  };
+
+  // Include error details if they exist
+  if ("details" in err) error.details = err.details;
+
+  // Include error stack in development mode
+  if (process.env.NODE_ENV === "development") error.stack = err.stack;
 
   response.status(status).json({
-    error: {
-      name,
-      status,
-      message,
-      // Include error stack in development mode.
-      ...(process.env.NODE_ENV === "development" && { stack: error.stack }),
-    },
+    error,
   });
 
   Logger.error(error);
