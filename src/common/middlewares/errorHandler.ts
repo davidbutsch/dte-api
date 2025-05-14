@@ -12,7 +12,7 @@ export const errorHandler: ErrorRequestHandler = (
 
   const name = isHttpError ? err.name : "InternalServerError";
   const status = isHttpError ? err.status : 500;
-  const message = isHttpError ? err.message : "Internal Server Error";
+  const message = err?.message || "Something went wrong.";
 
   const error: Record<string, any> = {
     name,
