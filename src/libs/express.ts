@@ -1,4 +1,4 @@
-import { env } from "@/common";
+import { env, NotFoundError } from "@/common";
 import express from "express";
 
 import { errorHandler } from "@/common";
@@ -11,6 +11,11 @@ export const app = express();
 app.enable("trust proxy");
 app.use(helmet());
 app.use(cors());
+
+// Handle undefined routes
+app.use((_request, _response, next) =>
+  next(new NotFoundError("Route not found."))
+);
 
 app.use(errorHandler);
 
