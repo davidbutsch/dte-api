@@ -1,12 +1,12 @@
 import { HttpError } from "@/common";
 import { Logger } from "@/libs";
-import { NextFunction, Request, Response } from "express";
+import { ErrorRequestHandler } from "express";
 
-export const errorHandler = (
-  error: any,
-  _request: Request,
-  response: Response,
-  _next: NextFunction
+export const errorHandler: ErrorRequestHandler = (
+  error,
+  _request,
+  response,
+  _next
 ) => {
   const isHttpError = error instanceof HttpError;
 

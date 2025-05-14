@@ -4,12 +4,12 @@ import {
   UnauthorizedError,
 } from "@/common";
 import { verifier } from "@/libs";
-import { NextFunction, Request, Response } from "express";
+import { RequestHandler } from "express";
 
-export const validateCognitoToken = async (
-  request: Request,
-  response: Response,
-  next: NextFunction
+export const validateCognitoToken: RequestHandler = async (
+  request,
+  response,
+  next
 ) => {
   // Get authorization header
   const authorizationHeader = request.headers["authorization"];
