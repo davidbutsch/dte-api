@@ -3,6 +3,7 @@ import express from "express";
 
 import { errorHandler } from "@/common";
 import { customerRouter } from "@/modules/customers";
+import { priceRouter } from "@/modules/prices";
 import cors from "cors";
 import helmet from "helmet";
 import { Logger } from "./winston";
@@ -16,6 +17,7 @@ app.use(express.json());
 
 // Routes
 app.use("/customers", customerRouter);
+app.use("/prices", priceRouter);
 
 // Handle undefined routes
 app.use((_request, _response, next) =>
