@@ -4,6 +4,7 @@ import express from "express";
 import { errorHandler } from "@/common";
 import { customerRouter } from "@/modules/customers";
 import { priceRouter } from "@/modules/prices";
+import { productRouter } from "@/modules/products";
 import cors from "cors";
 import helmet from "helmet";
 import { Logger } from "./winston";
@@ -17,6 +18,7 @@ app.use(express.json());
 
 // Routes
 app.use("/customers", customerRouter);
+app.use("/products", productRouter);
 app.use("/prices", priceRouter);
 
 // Handle undefined routes
