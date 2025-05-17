@@ -8,7 +8,6 @@ const validate = (
 ): RequestHandler => {
   return async (request, _response, next) => {
     try {
-      console.log(request.body);
       await schema.parseAsync(request[source]);
       next();
     } catch (error) {
