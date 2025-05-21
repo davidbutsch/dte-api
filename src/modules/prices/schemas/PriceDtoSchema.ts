@@ -4,6 +4,7 @@ export const PriceDtoSchema = z
   .object({
     id: z.string(),
     productId: z.string().nullable(),
+    lookupKey: z.string().nullable(),
     billingScheme: z.enum(["per_unit", "tiered"]),
     currency: z.string(),
     recurring: z

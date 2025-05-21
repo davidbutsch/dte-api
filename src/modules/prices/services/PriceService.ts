@@ -37,6 +37,7 @@ export class PriceService {
     const priceDto: PriceDto = {
       id: price.id,
       productId,
+      lookupKey: price.lookup_key,
       billingScheme: price.billing_scheme,
       currency: price.currency,
       recurring,
