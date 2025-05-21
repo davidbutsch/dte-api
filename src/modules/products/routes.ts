@@ -1,5 +1,9 @@
 import { validateRequestParams } from "@/common";
-import { GetProductParamsSchema, ProductController } from "@/modules/products";
+import {
+  GetProductParamsSchema,
+  GetProductPricesParamsSchema,
+  ProductController,
+} from "@/modules/products";
 import { Router } from "express";
 
 export const productRouter = Router();
@@ -11,4 +15,10 @@ productRouter.get(
   "/:productId",
   validateRequestParams(GetProductParamsSchema),
   productController.getProduct
+);
+
+productRouter.get(
+  "/:productId/prices",
+  validateRequestParams(GetProductPricesParamsSchema),
+  productController.getProductPrices
 );

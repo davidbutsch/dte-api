@@ -1,4 +1,8 @@
-import { GetProductParams, ProductService } from "@/modules/products";
+import {
+  GetProductParams,
+  GetProductPricesParams,
+  ProductService,
+} from "@/modules/products";
 import { Request, Response } from "express";
 
 export class ProductController {
@@ -25,5 +29,19 @@ export class ProductController {
     const product = await this.productService.getProductById(productId);
 
     response.json(product);
+  };
+
+  /**
+   * Gets product price ids from request parameter `productId`.
+   *
+   * Requires middleware(s):
+   * - `validateRequestParams(GetProductPriceIdsParamsSchema)`
+   */
+  getProductPrices = async (request: Request, response: Response) => {
+    const { productId } = request.params as GetProductPricesParams;
+
+    const prices = await this.productService.getProductPricesById(productId);
+
+    response.json(prices);
   };
 }

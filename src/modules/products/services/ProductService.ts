@@ -1,9 +1,12 @@
 import { InternalServerError, NotFoundError } from "@/common";
 import { stripe } from "@/libs";
+import { PriceDto, PriceService } from "@/modules/prices";
 import { ProductDto } from "@/modules/products";
 import Stripe from "stripe";
 
 export class ProductService {
+  private priceService = new PriceService();
+
   private stripeProductToDto = (product: Stripe.Product): ProductDto => {
     // Get default price ID, handling both string and object formats
     const defaultPriceId =
@@ -83,5 +86,23 @@ export class ProductService {
         error,
       });
     }
+  };
+
+  /**
+   * Gets prices by product id.
+   *
+   * @throws {NotFoundError} If product does not exist.
+   * @returns {PriceDto[]} PriceDto[]
+   */
+  getProductPricesById = async (id: string): Promise<PriceDto[]> => {
+    // Get product by id (throws not found)
+    const product = await this.getProductById(id);
+
+    // Get price dtos
+    const priceDtos = await this.priceService.getPricesByFilter({
+      product: product.id,
+    });
+
+    return priceDtos;
   };
 }

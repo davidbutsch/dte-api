@@ -79,4 +79,23 @@ export class PriceService {
       });
     }
   };
+
+  /**
+   * Gets price by stripe filter.
+   *
+   * @returns {PriceDto[]} PriceDto[]
+   */
+  getPricesByFilter = async (
+    filter: Stripe.PriceListParams
+  ): Promise<PriceDto[]> => {
+    const prices = await stripe.prices.list({
+      ...filter,
+      expand: ["data.tiers"],
+    });
+
+    // Return array of ProductDtos
+    const priceDtos = prices.data.map((price) => this.stripePriceToDto(price));
+
+    return priceDtos;
+  };
 }
