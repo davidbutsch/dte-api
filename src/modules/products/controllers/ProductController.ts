@@ -35,7 +35,7 @@ export class ProductController {
    * Gets product price ids from request parameter `productId`.
    *
    * Requires middleware(s):
-   * - `validateRequestParams(GetProductPriceIdsParamsSchema)`
+   * - `validateRequestParams(GetProductPricesParamsSchema)`
    */
   getProductPrices = async (request: Request, response: Response) => {
     const { productId } = request.params as GetProductPricesParams;
