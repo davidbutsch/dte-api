@@ -1,8 +1,4 @@
-import {
-  InternalServerError,
-  NotFoundError,
-  UnauthorizedError,
-} from "@/common";
+import { ForbiddenError, InternalServerError, NotFoundError } from "@/common";
 import { stripe } from "@/libs";
 import { CustomerService } from "@/modules/customers";
 import {
@@ -165,7 +161,7 @@ export class SubscriptionService {
   /**
    * Update Stripe subscription.
    *
-   * @throws {UnauthorizedError} If subscription is not associated with email.
+   * @throws {ForbiddenError} If subscription is not associated with email.
    * @returns {SubscriptionDto} SubscriptionDto
    */
   updateSubscriptionById = async (
@@ -181,7 +177,7 @@ export class SubscriptionService {
 
     // Verify subscription is associated with email
     if (customer.id !== subscription.customerId)
-      throw new UnauthorizedError(
+      throw new ForbiddenError(
         "Subscription cannot be updated by current customer."
       );
 
