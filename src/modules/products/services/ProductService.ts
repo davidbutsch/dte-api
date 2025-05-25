@@ -101,6 +101,7 @@ export class ProductService {
     // Get price dtos
     const priceDtos = await this.priceService.getPricesByFilter({
       product: product.id,
+      active: true,
     });
 
     return priceDtos;
