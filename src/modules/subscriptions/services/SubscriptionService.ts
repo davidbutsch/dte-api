@@ -151,6 +151,7 @@ export class SubscriptionService {
     const subscription = await stripe.subscriptions.create({
       customer: customer.id,
       items: body.items,
+      metadata: body.metadata,
     });
 
     const newSubscriptionDto = this.stripeSubscriptionToDto(subscription);

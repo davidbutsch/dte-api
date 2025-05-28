@@ -4,9 +4,11 @@ export const CreateSubscriptionItemSchema = z
   .object({
     price: z.string(),
     quantity: z.number().optional(),
-    discount: z.object({
-      promotion: z.string().optional(),
-    }),
+    discounts: z
+      .object({
+        promotion_code: z.string().optional(),
+      })
+      .array(),
     metadata: z.record(z.string(), z.string()).optional(),
   })
   // Disallows unrecognized keys
@@ -14,6 +16,7 @@ export const CreateSubscriptionItemSchema = z
 
 export const CreateSubscriptionBodySchema = z.object({
   items: z.array(CreateSubscriptionItemSchema).min(1),
+  metadata: z.record(z.string(), z.string()).optional(),
 });
 
 export type CreateSubscriptionItem = z.infer<
