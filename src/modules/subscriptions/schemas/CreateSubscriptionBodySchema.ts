@@ -4,6 +4,10 @@ export const CreateSubscriptionItemSchema = z
   .object({
     price: z.string(),
     quantity: z.number().optional(),
+    discount: z.object({
+      promotion: z.string().optional(),
+    }),
+    metadata: z.record(z.string(), z.string()).optional(),
   })
   // Disallows unrecognized keys
   .strict();

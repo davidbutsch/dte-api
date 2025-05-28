@@ -2,6 +2,7 @@ import { env, NotFoundError } from "@/common";
 import express from "express";
 
 import { errorHandler } from "@/common";
+import { couponRouter } from "@/modules/coupons";
 import { customerRouter } from "@/modules/customers";
 import { priceRouter } from "@/modules/prices";
 import { productRouter } from "@/modules/products";
@@ -32,6 +33,7 @@ app.use("/customers", customerRouter);
 app.use("/products", productRouter);
 app.use("/prices", priceRouter);
 app.use("/subscriptions", subscriptionRouter);
+app.use("/coupons", couponRouter);
 
 // Handle undefined routes
 app.use((request, _response, next) =>
