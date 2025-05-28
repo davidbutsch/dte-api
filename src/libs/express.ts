@@ -4,6 +4,7 @@ import express from "express";
 import { errorHandler } from "@/common";
 import { couponRouter } from "@/modules/coupons";
 import { customerRouter } from "@/modules/customers";
+import { paymentRouter } from "@/modules/payments";
 import { priceRouter } from "@/modules/prices";
 import { productRouter } from "@/modules/products";
 import { subscriptionRouter } from "@/modules/subscriptions";
@@ -34,6 +35,7 @@ app.use("/products", productRouter);
 app.use("/prices", priceRouter);
 app.use("/subscriptions", subscriptionRouter);
 app.use("/coupons", couponRouter);
+app.use("/payments", paymentRouter);
 
 // Handle undefined routes
 app.use((request, _response, next) =>
