@@ -1,4 +1,4 @@
-import { PaymentService } from "@/modules/payments";
+import { DeletePaymentMethodParams, PaymentService } from "@/modules/payments";
 import { Request, Response } from "express";
 
 export class PaymentController {
@@ -36,5 +36,21 @@ export class PaymentController {
     );
 
     response.json(setupIntent);
+  };
+
+  /**
+   * Creates stripe "setup intent" associated with customer.
+   *
+   * Requires middleware(s):
+   * - `validateRequestParams(DeletePaymentMethodParamsSchema)`
+   */
+  deletePaymentMethod = async (request: Request, response: Response) => {
+    const { paymentMethodId } = request.params as DeletePaymentMethodParams;
+
+    const paymentMethod = await this.paymentService.deletePaymentMethodById(
+      paymentMethodId
+    );
+
+    response.json(paymentMethod);
   };
 }

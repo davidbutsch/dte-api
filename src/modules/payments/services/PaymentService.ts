@@ -1,3 +1,4 @@
+import { InternalServerError, NotFoundError } from "@/common";
 import { stripe } from "@/libs";
 import { CustomerService } from "@/modules/customers";
 import { PaymentMethodDto } from "@/modules/payments";
@@ -90,5 +91,29 @@ export class PaymentService {
     };
 
     return setupIntentDto;
+  };
+
+  deletePaymentMethodById = async (
+    paymentMethodId: string
+  ): Promise<PaymentMethodDto> => {
+    try {
+      const paymentMethod = await stripe.paymentMethods.detach(paymentMethodId);
+
+      const paymentMethodDto = this.stripePaymentMethodToDto(paymentMethod);
+
+      return paymentMethodDto;
+    } catch (error) {
+      // Handle stripe errors
+      if (error instanceof Stripe.errors.StripeError)
+        switch (error.statusCode) {
+          case 404:
+            throw new NotFoundError("Payment method not found.");
+        }
+
+      // Otherwise throw InternalServerError and include unrecognized error
+      throw new InternalServerError(`Error getting payment method by id.`, {
+        error,
+      });
+    }
   };
 }
