@@ -7,6 +7,7 @@ import { customerRouter } from "@/modules/customers";
 import { paymentRouter } from "@/modules/payments";
 import { priceRouter } from "@/modules/prices";
 import { productRouter } from "@/modules/products";
+import { stripeRouter } from "@/modules/stripe";
 import { subscriptionRouter } from "@/modules/subscriptions";
 import cors from "cors";
 import helmet from "helmet";
@@ -17,7 +18,12 @@ export const app = express();
 app.enable("trust proxy");
 app.use(helmet());
 app.use(cors());
-app.use(express.json());
+
+// Only parse json for non-webhook requests
+app.use((request, response, next) => {
+  if (request.url == "/stripe/events") next();
+  else express.json()(request, response, next);
+});
 
 // Log requests
 app.use((request, _response, next) => {
@@ -36,6 +42,7 @@ app.use("/prices", priceRouter);
 app.use("/subscriptions", subscriptionRouter);
 app.use("/coupons", couponRouter);
 app.use("/payments", paymentRouter);
+app.use("/stripe", stripeRouter);
 
 // Handle undefined routes
 app.use((request, _response, next) =>
