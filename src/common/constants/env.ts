@@ -12,6 +12,10 @@ const keys = [
   "USER_POOL_ID",
   "USER_POOL_CLIENT_ID",
   "IDENTITY_POOL_ID",
+  "ACCESS_KEY_ID",
+  "SECRET_ACCESS_KEY",
+  "ASSETS_BUCKET_NAME",
+  "GALLERY_FOLDER_PREFIX",
 ] as const; // const assert creates readonly "tuple" array
 type Key = (typeof keys)[number];
 export type EnvKeys = Record<Key, string>;
