@@ -21,6 +21,7 @@ export class CustomerService {
       id: customer.id,
       name: customer.name,
       email: customer.email,
+      phoneNumber: customer.phone || null,
       defaultPaymentMethodId,
       metadata: customer.metadata,
     };
@@ -66,10 +67,13 @@ export class CustomerService {
     if (customersWithEmail.data.length > 0)
       throw new ConflictError("Customer with this email already exists.");
 
+    console.log(tokenPayload.phone_number);
+
     // Create stripe customer
     const customer = await stripe.customers.create({
       name: `${tokenPayload.given_name} ${tokenPayload.family_name}`,
       email: tokenPayload.email,
+      phone: tokenPayload.phone_number,
     });
 
     // Return CustomerDto
