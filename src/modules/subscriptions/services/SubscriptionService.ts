@@ -3,6 +3,7 @@ import { stripe } from "@/libs";
 import { CustomerService } from "@/modules/customers";
 import {
   CreateSubscriptionBody,
+  getFirstDayOfMonthUTCUnixTimestamp,
   SubscriptionDto,
   UpdateSubscriptionBody,
 } from "@/modules/subscriptions";
@@ -147,11 +148,27 @@ export class SubscriptionService {
     // Get customer from email (throws not found)
     const customer = await this.customerService.getCustomerByEmail(email);
 
+    const now = new Date();
+
+    // 0-indexed representation of current month where 0 is January and 11 is December
+    const currentMonthIndex = now.getUTCMonth();
+    const nextMonthIndex = currentMonthIndex + 1;
+
+    const firstDayOfCurrentMonth =
+      getFirstDayOfMonthUTCUnixTimestamp(currentMonthIndex);
+    const firstDayOfNextMonth =
+      getFirstDayOfMonthUTCUnixTimestamp(nextMonthIndex);
+
     // Create stripe subscription
     const subscription = await stripe.subscriptions.create({
       customer: customer.id,
       items: body.items,
       metadata: body.metadata,
+
+      // Charge customer immediately for an entire month (regardless of purchase date)
+      backdate_start_date: firstDayOfCurrentMonth,
+      // Bill customers on the first day of each month thereafter
+      billing_cycle_anchor: firstDayOfNextMonth,
     });
 
     const newSubscriptionDto = this.stripeSubscriptionToDto(subscription);
