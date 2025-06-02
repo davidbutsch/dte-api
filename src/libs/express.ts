@@ -5,6 +5,7 @@ import { errorHandler } from "@/common";
 import { couponRouter } from "@/modules/coupons";
 import { customerRouter } from "@/modules/customers";
 import { galleryRouter } from "@/modules/gallery";
+import { notificationRouter } from "@/modules/notifications";
 import { paymentRouter } from "@/modules/payments";
 import { priceRouter } from "@/modules/prices";
 import { productRouter } from "@/modules/products";
@@ -45,6 +46,7 @@ app.use("/coupons", couponRouter);
 app.use("/payments", paymentRouter);
 app.use("/stripe", stripeRouter);
 app.use("/gallery", galleryRouter);
+app.use("/notifications", notificationRouter);
 
 // Handle undefined routes
 app.use((request, _response, next) =>
