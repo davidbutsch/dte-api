@@ -67,8 +67,6 @@ export class CustomerService {
     if (customersWithEmail.data.length > 0)
       throw new ConflictError("Customer with this email already exists.");
 
-    console.log(tokenPayload.phone_number);
-
     // Create stripe customer
     const customer = await stripe.customers.create({
       name: `${tokenPayload.given_name} ${tokenPayload.family_name}`,
