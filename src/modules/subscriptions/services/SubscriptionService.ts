@@ -1,6 +1,7 @@
 import { ForbiddenError, InternalServerError, NotFoundError } from "@/common";
 import { stripe } from "@/libs";
 import { CustomerService } from "@/modules/customers";
+import { PriceService } from "@/modules/prices";
 import {
   CreateSubscriptionBody,
   getFirstDayOfMonthUTCUnixTimestamp,
@@ -11,6 +12,7 @@ import Stripe from "stripe";
 
 export class SubscriptionService {
   private customerService = new CustomerService();
+  private priceService = new PriceService();
 
   private stripeSubscriptionToDto = (
     subscription: Stripe.Subscription
@@ -147,29 +149,42 @@ export class SubscriptionService {
   ): Promise<SubscriptionDto> => {
     // Get customer from email (throws not found)
     const customer = await this.customerService.getCustomerByEmail(email);
+    // Get price from id (throws not found)
+    const price = await this.priceService.getPriceById(body.item.price);
 
-    const now = new Date();
-
-    // 0-indexed representation of current month where 0 is January and 11 is December
-    const currentMonthIndex = now.getUTCMonth();
-    const nextMonthIndex = currentMonthIndex + 1;
-
-    const firstDayOfCurrentMonth =
-      getFirstDayOfMonthUTCUnixTimestamp(currentMonthIndex);
-    const firstDayOfNextMonth =
-      getFirstDayOfMonthUTCUnixTimestamp(nextMonthIndex);
-
-    // Create stripe subscription
-    const subscription = await stripe.subscriptions.create({
+    const subscriptionData: Stripe.SubscriptionCreateParams = {
       customer: customer.id,
-      items: body.items,
+      items: [body.item],
       metadata: body.metadata,
+    };
+
+    // Set custom subscription billing cycle anchor if price metadata specifies first of the month
+    if (price.metadata?.billingCycleAnchor == "firstOfTheMonth") {
+      if (price.recurring?.interval !== "month")
+        throw new Error(
+          `Prices with billing cycle anchor "firstOfTheMonth" only support billing intervals of type "month".`
+        );
+
+      const now = new Date();
+
+      // 0-indexed representation of current month where 0 is January and 11 is December
+      const currentMonthIndex = now.getUTCMonth();
+      const periodEndMonthIndex =
+        currentMonthIndex + price.recurring?.intervalCount || 1;
 
       // Charge customer immediately for an entire month (regardless of purchase date)
-      backdate_start_date: firstDayOfCurrentMonth,
+      const firstDayOfCurrentMonth =
+        getFirstDayOfMonthUTCUnixTimestamp(currentMonthIndex);
       // Bill customers on the first day of each month thereafter
-      billing_cycle_anchor: firstDayOfNextMonth,
-    });
+      const firstDayOfPeriodEndMonth =
+        getFirstDayOfMonthUTCUnixTimestamp(periodEndMonthIndex);
+
+      subscriptionData.backdate_start_date = firstDayOfCurrentMonth;
+      subscriptionData.billing_cycle_anchor = firstDayOfPeriodEndMonth;
+    }
+
+    // Create stripe subscription
+    const subscription = await stripe.subscriptions.create(subscriptionData);
 
     const newSubscriptionDto = this.stripeSubscriptionToDto(subscription);
 
@@ -206,7 +221,6 @@ export class SubscriptionService {
     );
 
     // Return SubscriptionDto
-
     const subscriptionDto = this.stripeSubscriptionToDto(updatedSubscription);
 
     return subscriptionDto;
