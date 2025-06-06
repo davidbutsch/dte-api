@@ -15,7 +15,7 @@ export const CreateSubscriptionItemSchema = z
   .strict();
 
 export const CreateSubscriptionBodySchema = z.object({
-  item: CreateSubscriptionItemSchema,
+  items: z.array(CreateSubscriptionItemSchema).min(1),
   metadata: z.record(z.string(), z.string()).optional(),
 });
 

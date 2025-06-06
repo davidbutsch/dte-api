@@ -147,20 +147,28 @@ export class SubscriptionService {
     email: string,
     body: CreateSubscriptionBody
   ): Promise<SubscriptionDto> => {
+    if (body.items.length > 1)
+      throw new Error("This method only supports one item at a time.");
+
     // Get customer from email (throws not found)
     const customer = await this.customerService.getCustomerByEmail(email);
     // Get price from id (throws not found)
-    const price = await this.priceService.getPriceById(body.item.price);
+    const price = await this.priceService.getPriceById(body.items[0].price);
 
     const subscriptionData: Stripe.SubscriptionCreateParams = {
       customer: customer.id,
-      items: [body.item],
+      items: body.items,
       metadata: body.metadata,
     };
 
     // Set custom subscription billing cycle anchor if price metadata specifies first of the month
     if (price.metadata?.billingCycleAnchor == "firstOfTheMonth") {
-      if (price.recurring?.interval !== "month")
+      if (!price.recurring)
+        throw new Error(
+          `Prices with billing cycle anchor "firstOfTheMonth" must be recurring.`
+        );
+
+      if (price.recurring.interval !== "month")
         throw new Error(
           `Prices with billing cycle anchor "firstOfTheMonth" only support billing intervals of type "month".`
         );
@@ -170,7 +178,7 @@ export class SubscriptionService {
       // 0-indexed representation of current month where 0 is January and 11 is December
       const currentMonthIndex = now.getUTCMonth();
       const periodEndMonthIndex =
-        currentMonthIndex + price.recurring?.intervalCount || 1;
+        currentMonthIndex + price.recurring.intervalCount;
 
       // Charge customer immediately for an entire month (regardless of purchase date)
       const firstDayOfCurrentMonth =
@@ -185,6 +193,12 @@ export class SubscriptionService {
 
     // Create stripe subscription
     const subscription = await stripe.subscriptions.create(subscriptionData);
+
+    // Check if subscription is active (first invoice paid)
+    if (subscription.status !== "active")
+      throw new Error(
+        "Subscription is not active. Please try using a different card or contact our support email for more information."
+      );
 
     const newSubscriptionDto = this.stripeSubscriptionToDto(subscription);
 
