@@ -36,14 +36,16 @@ export class ProductService {
   };
 
   /**
-   * Gets all products from Stripe product catelog.
+   * Gets all active products from Stripe product catelog.
    *
    * @returns {ProductDto} ProductDto
    */
   getProducts = async (): Promise<ProductDto[]> => {
     try {
       // Get products
-      const products = await stripe.products.list();
+      const products = await stripe.products.list({
+        active: true,
+      });
 
       // Return array of ProductDtos
       const productDtos = products.data.map((product) =>
