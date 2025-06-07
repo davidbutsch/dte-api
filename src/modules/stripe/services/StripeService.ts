@@ -75,6 +75,12 @@ class StripeService {
       case "customer.subscription.created":
         await this.handleCustomerSubscriptionCreatedEvent(event);
         break;
+      case "customer.subscription.updated":
+        await this.handleCustomerSubscriptionUpdatedEvent(event);
+        break;
+      case "customer.subscription.deleted":
+        await this.handleCustomerSubscriptionDeletedEvent(event);
+        break;
       // throw internal error if an event has no handler
       default:
         throw new InternalServerError(
@@ -142,7 +148,8 @@ class StripeService {
   /**
    * Handles "customer.subscription.created" event.
    *
-   * Updates customer metadata to include `subscribed: "yes"`
+   * If subscription is active -> update customer metadata to include `subscribed: "yes"`
+   * Otherwise -> update customer metadata to include `subscribed: "no"`
    */
   private handleCustomerSubscriptionCreatedEvent = async (
     event: Stripe.CustomerSubscriptionCreatedEvent
@@ -159,11 +166,62 @@ class StripeService {
       // Stripe does not replace all metadata properties when passing a single metadata property
       // Instead, it extends the current metadata object with this new property
       metadata: {
-        subscribed: "yes",
+        subscribed: subscription.status == "active" ? "yes" : "no",
       },
     });
 
     Logger.info(`Subscription ${subscription.id} created for ${customerId}.`);
+  };
+
+  /**
+   * Handles "customer.subscription.updated" event.
+   *
+   * If subscription is active -> update customer metadata to include `subscribed: "yes"`
+   * Otherwise -> update customer metadata to include `subscribed: "no"`
+   */
+  private handleCustomerSubscriptionUpdatedEvent = async (
+    event: Stripe.CustomerSubscriptionUpdatedEvent
+  ): Promise<void> => {
+    const subscription = event.data.object;
+
+    // Get customer ID, handling both string and object formats
+    const customerId =
+      typeof subscription.customer === "string"
+        ? subscription.customer
+        : subscription.customer?.id;
+
+    await stripe.customers.update(customerId, {
+      // Stripe does not replace all metadata properties when passing a single metadata property
+      // Instead, it extends the current metadata object with this new property
+      metadata: {
+        subscribed: subscription.status == "active" ? "yes" : "no",
+      },
+    });
+  };
+
+  /**
+   * Handles "customer.subscription.deleted" event.
+   *
+   * Updates customer metadata to include `subscribed: "no"`
+   */
+  private handleCustomerSubscriptionDeletedEvent = async (
+    event: Stripe.CustomerSubscriptionDeletedEvent
+  ): Promise<void> => {
+    const subscription = event.data.object;
+
+    // Get customer ID, handling both string and object formats
+    const customerId =
+      typeof subscription.customer === "string"
+        ? subscription.customer
+        : subscription.customer?.id;
+
+    await stripe.customers.update(customerId, {
+      // Stripe does not replace all metadata properties when passing a single metadata property
+      // Instead, it extends the current metadata object with this new property
+      metadata: {
+        subscribed: "no",
+      },
+    });
   };
 }
 
