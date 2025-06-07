@@ -13,6 +13,6 @@ export class StripeController {
 
     await this.stripeService.handleStripeEvent(request.body, signature);
 
-    response.status(200);
+    response.json({ message: "success" });
   };
 }
