@@ -130,7 +130,6 @@ export class SubscriptionService {
     });
 
     // Return SubscriptionDto array
-    // Return SubscriptionDto array
     const subscriptionDtos = subscriptions.data.map((subscription) =>
       this.stripeSubscriptionToDto(subscription)
     );
@@ -177,18 +176,16 @@ export class SubscriptionService {
 
       // 0-indexed representation of current month where 0 is January and 11 is December
       const currentMonthIndex = now.getUTCMonth();
-      const periodEndMonthIndex =
-        currentMonthIndex + price.recurring.intervalCount;
 
-      // Charge customer immediately for an entire month (regardless of purchase date)
-      const firstDayOfCurrentMonth =
+      // Treat subscription as though it was created on the first day of current month
+      subscriptionData.backdate_start_date =
         getFirstDayOfMonthUTCUnixTimestamp(currentMonthIndex);
-      // Bill customers on the first day of each month thereafter
-      const firstDayOfPeriodEndMonth =
-        getFirstDayOfMonthUTCUnixTimestamp(periodEndMonthIndex);
 
-      subscriptionData.backdate_start_date = firstDayOfCurrentMonth;
-      subscriptionData.billing_cycle_anchor = firstDayOfPeriodEndMonth;
+      // Define when billing should start
+      subscriptionData.billing_cycle_anchor =
+        getFirstDayOfMonthUTCUnixTimestamp(
+          currentMonthIndex + price.recurring.intervalCount
+        );
     }
 
     // Create stripe subscription
