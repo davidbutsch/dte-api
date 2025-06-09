@@ -37,6 +37,11 @@ app.use((request, _response, next) => {
   next();
 });
 
+// Health check endpoint
+app.get("/health", (_request, response) => {
+  response.status(200).send();
+});
+
 // Routes
 app.use("/customers", customerRouter);
 app.use("/products", productRouter);
