@@ -1,4 +1,9 @@
-import { ASSETS_BUCKET_URL, env, InternalServerError } from "@/common";
+import {
+  ASSETS_BUCKET_URL,
+  env,
+  GALLERY_FOLDER_PREFIX,
+  InternalServerError,
+} from "@/common";
 import { s3Client } from "@/libs";
 import { ListObjectsV2Command } from "@aws-sdk/client-s3";
 
@@ -19,7 +24,7 @@ export class GalleryService {
 
       const command = new ListObjectsV2Command({
         Bucket: env.keys.ASSETS_BUCKET_NAME,
-        Prefix: env.keys.GALLERY_FOLDER_PREFIX,
+        Prefix: GALLERY_FOLDER_PREFIX,
         ContinuationToken,
         MaxKeys: limit,
       });
@@ -30,7 +35,7 @@ export class GalleryService {
         // Only push item Key (the file path) if it does not match the gallery folder prefix
         // Only push item Key (^) if it is defined
         for (const item of response.Contents)
-          if (item.Key !== env.keys.GALLERY_FOLDER_PREFIX && item.Key)
+          if (item.Key !== GALLERY_FOLDER_PREFIX && item.Key)
             // Prepend file path with assets bucket url
             paths.push(ASSETS_BUCKET_URL + item.Key);
 

@@ -15,7 +15,6 @@ const keys = [
   "ACCESS_KEY_ID",
   "SECRET_ACCESS_KEY",
   "ASSETS_BUCKET_NAME",
-  "GALLERY_FOLDER_PREFIX",
 ] as const; // const assert creates readonly "tuple" array
 type Key = (typeof keys)[number];
 export type EnvKeys = Record<Key, string>;
